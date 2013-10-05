@@ -2,7 +2,7 @@ import logging, os, subprocess, time, re, json, atexit
 import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
-testpgn = 'pgn/hairui_vs_snowroads_2013_08_29.pgn'
+testpgn = 'pgn/RubMyChess_vs_snowroads_2013_09_26.pgn'
 
 DEBUG_ENGINE = False
 engine = None
@@ -72,15 +72,7 @@ def calculate_blunders(pgnpath):
             except Exception, ee:
                 pass
             break
-        try:
-            display_results(states, gamepgn, FIRST, LAST)
-        except Exception, e:
-            import ipdb;ipdb.set_trace()
-            try:
-                display_results(states, gamepgn, FIRST, LAST)
-            except:
-                pass
-            continue
+        display_results(states, gamepgn, FIRST, LAST, n)
     #states = add_missing_played_moves(states, gamepgn)
     blunder_result = {'result': gamepgn.result,'states': states, 'version': '1.0', 'pgnpath': pgnpath, 'startfen': gamepgn.fen, 'pgn': pgntext, 'moves': gamepgn.moves,}
     return blunder_result

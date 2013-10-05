@@ -112,7 +112,7 @@ class Engine(object):
         board = get_board(gamepgn, movenum)
         #the move he's going to play in this position.
         nowfen = board.asFen()
-        use_multipv = max(16-movenum/5, 4)
+        use_multipv = max(40-movenum/2, 4)
         print 'using multipv %d' % use_multipv
         self.set_multipv(use_multipv)
         self.put('position fen %s' % (nowfen))
@@ -164,7 +164,7 @@ class Engine(object):
             move = read_move(line, board, gamepgn, movenum)
             if not move:
                 continue
-            if int(move['nodes']) < 10000:
+            if int(move['nodes']) < 10000 and not move['mate']:
                 import ipdb;ipdb.set_trace()
             print 'evalled move %s %s %s' % (move['move'], move['nodes'], move['value'])
 

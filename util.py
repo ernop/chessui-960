@@ -50,7 +50,7 @@ def setup_logging():
     FORMAT = '%(asctime)s %(levelname)s %(message)s'
     logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 
-def display_results(states, gamepgn, FIRST, LAST):
+def display_results(states, gamepgn, FIRST, LAST, current):
     from precalc import get_board
     for mm in range(FIRST, LAST):
         nn = mm - 1
@@ -59,9 +59,14 @@ def display_results(states, gamepgn, FIRST, LAST):
         if nn + 1 not in states:
             continue
         board = get_board(gamepgn, nn)
-        print '\n\n'
-        print '=' * 50
-        print_fen(board.asFen())
+        if nn % 2 == 1:color = 'Black'
+        else:color = 'White'
+
+        if mm == current:
+            print '\n%s to move' % color, nn
+            print '\n\n'
+            print '=' * 50
+            print_fen(board.asFen())
         if nn not in states:
             continue
         res = states[nn]
@@ -71,7 +76,5 @@ def display_results(states, gamepgn, FIRST, LAST):
         else:
             hasnext = False
             nextres = None
-        if nn % 2 == 1:color = 'Black'
-        else:color = 'White'
-        print '\n%s to move' % color, nn
+
         #print pprint.pprint(states[nn])

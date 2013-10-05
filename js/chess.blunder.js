@@ -232,8 +232,24 @@ function draw_move_value(guy, target){
     //should set up start / end square descriptors here for ease.
     var start=guy['move'].split("-")[0]
     var end=guy['move'].split("-")[1]
-  var res='<tr class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['move']+'>'+guy['move']+'<td class="movevalue">'+calcval;
+    //debugger;
+    var san = lookup_san(guy['move'])
+  var res='<tr class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['move']+'>'+san+'<td class="movevalue">'+calcval;
   target.append(res);
+}
+
+function lookup_san(move){
+    var san=null;
+    var movefrom=move.split('-')[0]
+    var moveto=move.split('-')[1]
+    $.each(game.moves({verbose:true}), function(index,guy){
+            if (san){return}
+            if (guy['from']==movefrom && guy['to']==moveto){
+                san=guy['san']
+                return
+            }
+    })
+    return san
 }
 
 function setup_buttons(){
