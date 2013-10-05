@@ -1,12 +1,11 @@
- <link rel="stylesheet" href="css/chessboard-0.3.0.css" />
+ <link rel="stylesheet" href="chessincludes/css/chessboard-0.3.0.css" />
 
-<script src="js/chess.js"></script>
-<script src="js/chessboard-0.3.0.js"></script>
-<script src="js/jquery.js"></script>
-<script src="js/chess.blunder.util.js"></script>
-<script src="js/chess.blunder.functions.js"></script>
-<script src="js/chess.blunder.js"></script>
-<script src="js/pregen/{{pregen_js_name}}"></script>
+<script src="chessincludes/js/chess.js"></script>
+<script src="chessincludes/js/chessboard-0.3.0.js"></script>
+<script src="chessincludes/js/jquery.js"></script>
+<script src="chessincludes/js/chess.blunder.util.js"></script>
+<script src="chessincludes/js/chess.blunder.functions.js"></script>
+<script src="chessincludes/js/chess.blunder.js"></script>
 <!--info: from https://github.com/ernop/chessui-960 -->
 
 <style>
@@ -40,7 +39,7 @@ body{font-family:calibri;}
 .pvzone{}
 .pvmove{margin:4px;display:inline-block;background-color:lightgrey;padding:3px;cursor:pointer;border-radius:4px;border:4px solid grey;}
 .examining-var{background-color:orange;}
-#varzone{display:inline-block;margin-top:5px;height:100px;}
+#varzone{display:inline-block;margin-top:5px;height:100px;width:510px;}
 .medium{font-weight:bold;font-size:1.4em;}
 #pv{height:50px;display:inline-block;}
 #game-navzone{margin-top:10px;}
@@ -53,9 +52,10 @@ $(document).ready(function(){
     start_blunder();
     })
 </script>
+</head>
 
 <body style="width:850px;margin:0 auto;">
-
+<script src="js/pregen/{{pregen_js_name}}"></script>
 <div class="main">
 <div class="medium" style="float:right;margin-right:210px;">Move Values</div>
 <div style="clear:both;" id=blunderinfo></div>
@@ -74,8 +74,8 @@ $(document).ready(function(){
 <p style="display:none;">Code: <span id="code"></span></p>
 
 
-<p>Status: <span id="status"></span></p>
-<div id=flipper class="littlebutton" style="float:left;clear:both;">flip board</div><script>$(document).ready(function(){$("#flipper").click(function(){board.flip()})})</script>
+<p>Status: <span id="status"></span>
+<div id=flipper class="littlebutton" style="float:left;clear:both;">flip board</div><script>$(document).ready(function(){$("#flipper").click(function(){board.flip()})})</script></p>
 <br>
 <p>An engine has analyzed the game, finding the best move, the value of the move played, and other good potential moves, for every position.
 

@@ -3,15 +3,17 @@ import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
 
-EARLY_MULTIPV = 50
-MULTIPV = 3
+EARLY_MULTIPV = 20  #before halfmove 10
+MULTIPV = 4
+#it'll try to think longer to compensate for the increased early_multipv.
+
 setup_cmds = ['setoption name Threads value 3','setoption name Hash value 450', 'setoption name UCI_Chess960 value true', 'isready', 'setoption name MultiPV value %d' % MULTIPV]
               #'setoption name MultiPV value 10'
               #]
 tb = 'setoption name GaviotaTbPath value e:\dl\Gaviota'
 
 DEBUG_ENGINE = False
-THINK_TIME = 0.2
+THINK_TIME = 20
 engine = None
 
 from util import *
@@ -88,7 +90,7 @@ class Engine(object):
         nowfen = board.asFen()
         use_think_time = THINK_TIME
         if movenum < 10:
-            use_think_time *= 3
+            use_think_time *= EARLY_MULTIPV / MULTIPV
             self.set_multipv(EARLY_MULTIPV)
             self.active_pv = EARLY_MULTIPV
         else:

@@ -84,7 +84,7 @@ function eval_current_move_info(){
     bestval=null;
     $.each(current_move_information, function(index,guy){
         workingval=guy['value']*Math.pow(-1,movenumber);
-        if (!bestval || workingval >bestval)
+        if (bestval==null || workingval >bestval)
           {bestval = workingval}
     })
     bestval=bestval*Math.pow(-1,movenumber)
@@ -189,7 +189,7 @@ function am_hovering_square(square){
     var rows=$('tr.blunder-row[start-square='+square+']')
     $.each(rows, function(index,guy){$(guy).find('.movedesc').addClass('hovered-movedesc')})
 
-    statusEl.html('hovering on'+square)
+    //statusEl.html('hovering on'+square)
 }
 
 function highlight_moves_on_drag(source, piece, position, orientation, fen){
@@ -288,7 +288,7 @@ function load_pv(pv){
                         });
                         //board.position(game.fen(),0)
                         console.log("going forward: "+source+'-'+target);
-                        if (move == null){debugger;}
+                        if (move == null){statusEl.html('960 castling doesnt work in variations yet, sorry.')}
                     }
                 }else if (nowindex>pvindex){
                     for (ii=nowindex;ii>pvindex;ii--){
@@ -302,7 +302,7 @@ function load_pv(pv){
                 nowindex=pvindex;
         })
     })
-    pvEl.append($('<div class="medium"  id="navigate-restore">back to main line</div>'))
+    pvEl.append($('<div class="medium" style="width:179px;" id="navigate-restore">back to main line</div>'))
     $('#navigate-restore').click(function(){
         load_movenum(movenumber);
     });

@@ -2,12 +2,12 @@ import logging, os, subprocess, time, re, json, atexit
 import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
-testpgn = 'RubMyChess_vs_snowroads_2013_09_26.pgn'
+testpgn = 'pgn/hairui_vs_snowroads_2013_08_29.pgn'
 
 DEBUG_ENGINE = False
 engine = None
 GLOBAL_LAST = 7
-#GLOBAL_LAST = None
+GLOBAL_LAST = None
 
 from util import *
 

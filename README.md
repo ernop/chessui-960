@@ -23,7 +23,7 @@ EARLY_MULTIPV = 50 (how many variations to force the engine to generate in the f
 
 MULTIPV = 3 (for the rest of the game, how many pvs?)
 
-THINK_TIME = 0.2 (first 10 half moves it'll think 3x this long)
+THINK_TIME = 20 (first 10 half moves it'll think 3x this long)
 
 What you get
 ---------------------------------
