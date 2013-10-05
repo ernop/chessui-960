@@ -238,11 +238,12 @@ function draw_move_value(guy, target){
   target.append(res);
 }
 
-function lookup_san(move){
+function lookup_san(move, fakegame){
+    if (fakegame){use_game=fakegame}else{use_game=game}
     var san=null;
     var movefrom=move.split('-')[0]
     var moveto=move.split('-')[1]
-    $.each(game.moves({verbose:true}), function(index,guy){
+    $.each(use_game.moves({verbose:true}), function(index,guy){
             if (san){return}
             if (guy['from']==movefrom && guy['to']==moveto){
                 san=guy['san']
@@ -279,14 +280,22 @@ function load_pv(pv, in_mainline){
         $('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']').find('.movedesc').addClass('examining-var').html("variation");
     }
     pvEl.append($('<div class="medium">Variation:</div>'))
+    fakegame=new Chess;
+    fakegame.load(var_start_fen)
     $.each(pv, function(index,guy){
-        var pvblock=$('<div pv-index='+index+' class="pvmove">'+guy+'</div>');
+        //debugger;
+        var san=lookup_san(guy, fakegame)
+        var movefrom=guy.split('-')[0]
+        var moveto=guy.split('-')[1]
+        var move=fakegame.move({from:movefrom,to:moveto});
+        if (move==null){san=guy;
+            //revert to using the algebraic.
+            }
+        var pvblock=$('<div pv-index='+index+' class="pvmove">'+san+'</div>');
         pvEl.append(pvblock);
         pvblock.hover(function(thing){
-                //debugger;
                 if (hovering){return}
                 hovering=true;
-
                 var guy=$(thing.target).closest('.pvmove');
                 //advance the game to this point.
                 var pvindex=parseInt(guy.attr('pv-index'));
