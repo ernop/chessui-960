@@ -3,7 +3,7 @@ import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
 
-EARLY_MULTIPV = 5
+EARLY_MULTIPV = 50
 MULTIPV = 3
 setup_cmds = ['setoption name Threads value 3','setoption name Hash value 450', 'setoption name UCI_Chess960 value true', 'isready', 'setoption name MultiPV value %d' % MULTIPV]
               #'setoption name MultiPV value 10'
@@ -11,7 +11,7 @@ setup_cmds = ['setoption name Threads value 3','setoption name Hash value 450', 
 tb = 'setoption name GaviotaTbPath value e:\dl\Gaviota'
 
 DEBUG_ENGINE = False
-THINK_TIME = 20
+THINK_TIME = 0.2
 engine = None
 
 from util import *

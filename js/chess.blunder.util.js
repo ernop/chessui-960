@@ -97,6 +97,7 @@ function remove_castling_from_fen(fen){
 }
 
 get_json = function (my_url) {
+    //doesnt actually do anything.
     return testjson
     var json = null;
     $.ajax({

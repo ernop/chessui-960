@@ -7,7 +7,7 @@ testpgn = 'RubMyChess_vs_snowroads_2013_09_26.pgn'
 DEBUG_ENGINE = False
 engine = None
 GLOBAL_LAST = 7
-GLOBAL_LAST = None
+#GLOBAL_LAST = None
 
 from util import *
 
@@ -112,15 +112,24 @@ def add_missing_played_moves(states, gamepgn):
     return states
 
 def do_game(pgnpath):
-    jsonfn = 'js/' + os.path.split(pgnpath)[-1].replace('.pgn', '.js')
-    if os.path.exists(jsonfn):
-        print 'Over Writing unless you cancel: %s' % jsonfn
+    assert os.path.isdir("js/pregen")
+    assert os.path.exists(pgnpath)
+    jsfn = os.path.split(pgnpath)[-1].replace('.pgn', '.js')
+    jsfp = 'js/pregen/' + jsfn
+    if os.path.exists(jsfp):
+        print 'Over Writing unless you cancel: %s' % jsfp
         #time.sleep(1)
     else:
-        print 'will create %s' % jsonfn
+        print 'will create %s' % jsfp
     blunder_result = calculate_blunders(pgnpath)
-    open(jsonfn, 'w').write('testjson='+json.dumps(blunder_result))
-    print 'created', jsonfn
+    open(jsfp, 'w').write('testjson='+json.dumps(blunder_result))
+    htmlfp = jsfn.replace('.js', '.html')
+    if os.path.exists(htmlfp):
+        print 'overwriting %s', htmlfp
+    htmltext = open('replayer_template.html', 'r').read()
+    newtext = htmltext.replace('{{pregen_js_name}}', jsfn)
+    open(htmlfp, 'w').write(newtext)
+    print 'created js: %s, html %s' % (jsfp, htmlfp)
 
 if __name__ == "__main__":
     engine = setup_engine()

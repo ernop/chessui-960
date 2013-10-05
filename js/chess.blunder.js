@@ -328,10 +328,10 @@ function setup_base_board(){
     updateStatus();
 }
 
-function start_blunder(jsonfp){
+function start_blunder(){
     codeEl=$('#code')
     setup_base_board();
-    gamedata=get_json(jsonfp)
+    gamedata=get_json()
     load_movenum(0);
     setup_buttons();
 }
