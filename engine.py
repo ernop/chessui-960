@@ -3,11 +3,11 @@ import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
 
-THINK_TIME = .1
+THINK_TIME = 5
 #per move from multipv
-FOR_BEST_TIME = .2
+FOR_BEST_TIME = 10
 #for the single best search on the raw board, to make sure we find it at least!
-OVERRIDE_TIME = 1
+OVERRIDE_TIME = 5
 #the first (bad) possible move will be searched to this depth.
 
 setup_cmds = ['xboard',
@@ -112,7 +112,7 @@ class Engine(object):
         board = get_board(gamepgn, movenum)
         #the move he's going to play in this position.
         nowfen = board.asFen()
-        use_multipv = max(16-movenum/2, 1)
+        use_multipv = max(16-movenum/5, 4)
         print 'using multipv %d' % use_multipv
         self.set_multipv(use_multipv)
         self.put('position fen %s' % (nowfen))
