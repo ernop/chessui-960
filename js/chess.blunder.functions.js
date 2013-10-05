@@ -29,32 +29,44 @@ var onDrop = function(source, target) {
       //if it was the game move, load the next blundermove
       if (gamedata['states'][movenumber]){
           var state=gamedata['states'][movenumber];
-          combomove=source+'-'+target;
+          actualmove=source+'-'+target;
           //maybe have an x in here?
-          if (combomove==state['thismove']  && !mainline_disabled ){
+          if (actualmove==state['thismove']  && !mainline_disabled ){
               //advance
               load_movenum(movenumber+1,true)
-          }
-          else{
-            //debugger;
-            //otherwise, just lock the board and show the pv
-            if (!mainline_disabled){
-            var thisguy=null;
-            $.each(state['moves'], function(index,guy){
-                if (guy['move']==combomove){
-                    thisguy=guy;
-                }
-            })
-            if (thisguy){
-                load_pv(thisguy['pv']);
+          }else{
+            load_variations(state, actualmove);
             }
-            mainline_disabled=true;
-            clear_static_hovers()
-            }else{
-                //mainline was already disabled
-            }
-          }
     }
+}
+
+function load_variations(state, actualmove, in_mainline){
+    //actually we should show the main variation for game moves, too.
+    //otherwise, just lock the board and show the pv
+
+    //actualmove refers to the move on the board.  if the user is playing a variation, it will not be the played move & will be sent along
+    // if the main var is shown as a result of navigation/playing the game move, we show the expected continuation anyway
+    //and just figure out the actualmove based on the current bestmove.
+    //debugger;
+    var thisguy=null;
+    $.each(state['moves'], function(index,guy){
+        if (thisguy){return}
+        if (guy['bestmove'] && actualmove==null){
+            thisguy=guy;
+            //when not given the move, just show the best var
+        }
+        else if (guy['move']==actualmove){
+            thisguy=guy;
+        }
+    })
+    if (thisguy){
+        load_pv(thisguy['pv'], in_mainline);
+    }
+
+    clear_static_hovers()
+    if (in_mainline){}else{mainline_disabled=true;}
+
+    //it'll be unset if this was called from load_movenum.
 }
 
 var updateStatus = function() {

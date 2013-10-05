@@ -18,9 +18,11 @@ function load_movenum(num,instant){
     game.load(remove_castling_from_fen(gamedata['states'][num].nowfen));
     movenumber=num;
     setup_current_move_info(num)
+    reset_pv();
+    load_variations(state, null, 1) //don't send any actual move, and send "in_mainline" as true
+    mainline_disabled=false;
     highlight_static_squares()
     show_move_values()
-    reset_pv();
 }
 
 function reset_pv(){
@@ -245,18 +247,21 @@ function setup_buttons(){
     });
 }
 
-function load_pv(pv){
+function load_pv(pv, in_mainline){
     pvEl.html('<div class="pvzone"></div>')
     global_pv=pv;
     hovering=false;
     var_start_fen=game.fen();
     nowindex=0;
     //debugger;
+
     var pv_start_square=pv[0].split('-')[0];
     var pv_end_square=pv[0].split('-')[1];
     //debugger;
     //$('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']')
-    $('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']').find('.movedesc').addClass('examining-var').html("variation");
+    if (!in_mainline){
+        $('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']').find('.movedesc').addClass('examining-var').html("variation");
+    }
     pvEl.append($('<div class="medium">Variation:</div>'))
     $.each(pv, function(index,guy){
         var pvblock=$('<div pv-index='+index+' class="pvmove">'+guy+'</div>');
@@ -269,14 +274,10 @@ function load_pv(pv){
                 var guy=$(thing.target).closest('.pvmove');
                 //advance the game to this point.
                 var pvindex=parseInt(guy.attr('pv-index'));
-                if (nowindex==pvindex){hovering=false;return}
-                //debugger;
-                //game.load(var_start_fen)
-                //board.position(game.fen(),0)
-                //moev to the nth var of the pv
-                //debugger;
-                if (nowindex<pvindex){
-                    for (ii=nowindex+1;ii<=pvindex;ii++){
+                //if (nowindex>pvindex){hovering=false;return}
+                clear_board_highlights()
+                if (nowindex<=pvindex){
+                    for (ii=nowindex;ii<=pvindex;ii++){
                         var thismove=pv[ii];
                         var source=thismove.split('-')[0];
                         var target=thismove.split('-')[1];
@@ -287,17 +288,17 @@ function load_pv(pv){
                             //todo fix this
                         });
                         //board.position(game.fen(),0)
-                        console.log("going forward: "+source+'-'+target);
+                        //console.log("going forward: "+source+'-'+target);
                         if (move == null){statusEl.html('960 castling doesnt work in variations yet, sorry.')}
                     }
                 }else if (nowindex>pvindex){
                     for (ii=nowindex;ii>pvindex;ii--){
                         game.undo();
-                        console.log("undoing");
+                        //console.log("undoing");
                     }
                 }
                 board.position(game.fen(),0)
-                console.log("setting to game fen.",game.fen())
+                //console.log("setting to game fen.",game.fen())
                 hovering=false
                 nowindex=pvindex;
         })

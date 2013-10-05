@@ -6,7 +6,7 @@ testpgn = 'pgn/hairui_vs_snowroads_2013_08_29.pgn'
 
 DEBUG_ENGINE = False
 engine = None
-GLOBAL_LAST = 7
+GLOBAL_LAST = 5
 GLOBAL_LAST = None
 
 from util import *
@@ -46,6 +46,7 @@ def read_move(infoline, board, gamepgn, movenum):
            'move': LANmove,
            }
     res['pv'] = [adddash(n) for n in res['pv'].split()]
+    #print infoline
     return res
 
 def calculate_blunders(pgnpath):
@@ -80,7 +81,7 @@ def calculate_blunders(pgnpath):
             except:
                 pass
             continue
-    states = add_missing_played_moves(states, gamepgn)
+    #states = add_missing_played_moves(states, gamepgn)
     blunder_result = {'result': gamepgn.result,'states': states, 'version': '1.0', 'pgnpath': pgnpath, 'startfen': gamepgn.fen, 'pgn': pgntext, 'moves': gamepgn.moves,}
     return blunder_result
 
@@ -95,18 +96,29 @@ def add_missing_played_moves(states, gamepgn):
             continue
         if movenum + 1 in states:
             nextstate = states[movenum+1]
-            nextstate_bestmove= [s for s in nextstate['moves'] if s['bestmove']]
-            if nextstate_bestmove:
-                nextstate_bestmove = nextstate_bestmove[0]
-            else:
+            nextstate_bestmove = None
+            if 'moves' in nextstate:
+                for s in nextstate['moves']:
+                    if 'bestmove' in s and s['bestmove']:
+                        nextstate_bestmove = s
+                        break
+            if not nextstate_bestmove:
                 continue
+            if nextstate_bestmove['value'] is not None:
+                nextstate_val = nextstate_bestmove['value']
+            else:
+                nextstate_val = ''  #this is a failure.
+                import ipdb;ipdb.set_trace()
+            #we should
+            nextpv = nextstate_bestmove['pv']
+            nextpv.insert(0, state['thismove'])
             playedmove = {'bestmove': False,
                 'mate': nextstate_bestmove['mate'] and str(-1*int(nextstate_bestmove['mate'])) or '',
                 'move': state['thismove'],
                 'playedmove': True,
-                'pv': [],
+                'pv': nextpv,  #we fake up the pv of the actually played move by looking ahead in the tree.
                 'nodes': 0,
-                'value':  nextstate_bestmove['value'] is not None and (nextstate_bestmove['value']) or ''
+                'value': nextstate_val,
                 }
             state['moves'].append(playedmove)
     return states
@@ -117,15 +129,14 @@ def do_game(pgnpath):
     jsfn = os.path.split(pgnpath)[-1].replace('.pgn', '.js')
     jsfp = 'js/pregen/' + jsfn
     if os.path.exists(jsfp):
-        print 'Over Writing unless you cancel: %s' % jsfp
-        #time.sleep(1)
+        print 'overwriting unless you cancel: %s' % jsfp
     else:
         print 'will create %s' % jsfp
     blunder_result = calculate_blunders(pgnpath)
     open(jsfp, 'w').write('testjson='+json.dumps(blunder_result))
     htmlfp = jsfn.replace('.js', '.html')
     if os.path.exists(htmlfp):
-        print 'overwriting %s', htmlfp
+        print 'overwriting %s' % htmlfp
     htmltext = open('replayer_template.html', 'r').read()
     newtext = htmltext.replace('{{pregen_js_name}}', jsfn)
     open(htmlfp, 'w').write(newtext)

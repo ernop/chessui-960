@@ -1,4 +1,4 @@
-import atexit, subprocess, logging
+import atexit, subprocess, logging, pprint
 
 def setup_killer(engine):
     killer = Killer(engine)
@@ -34,9 +34,12 @@ def adddash(x):
         import ipdb;ipdb.set_trace()
         return ''
 
+def removedash(x):
+    return x.replace("-", '')
+
 def start_houdini():
     engine = subprocess.Popen(
-        'D:/chessengine/houdini3/Houdini_3_Pro_w32_CBF.exe',
+        'D:/chessengine/houdini3/Houdini_3.exe',
         universal_newlines=True,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
@@ -71,3 +74,4 @@ def display_results(states, gamepgn, FIRST, LAST):
         if nn % 2 == 1:color = 'Black'
         else:color = 'White'
         print '\n%s to move' % color, nn
+        #print pprint.pprint(states[nn])
