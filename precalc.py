@@ -2,12 +2,12 @@ import logging, os, subprocess, time, re, json, atexit
 import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
-testpgn = 'pgn/RubMyChess_vs_snowroads_2013_09_26.pgn'
+testpgn = 'pgn/umaaki_vs_snowroads_2013_09_03.pgn'
 
 DEBUG_ENGINE = False
 engine = None
-GLOBAL_LAST = 5
-GLOBAL_LAST = None
+GLOBAL_LAST = 2
+#GLOBAL_LAST = None
 
 from util import *
 
@@ -39,15 +39,17 @@ def read_move(infoline, board, gamepgn, movenum):
     ANmove = pv.split(' ')[0]
     LANmove = lmove.toLAN (board, lmove.parseAN(board, ANmove))
     LANmove = ''.join([c for c in LANmove.replace('x', '-') if c.lower()==c])
+    SANmove = lmove.toSAN (board, lmove.parseAN(board, ANmove))
     res = {'nodes': re.compile(r'nodes ([\d]+)').findall(infoline)[0],
            'value': value,
            'mate': mate,
-           'pv': pv,
-           'move': LANmove,
+           'pv': movelist2san(board, pv.split()),
+           'move': SANmove,
+           'lanmove': LANmove,
            }
-    res['pv'] = [adddash(n) for n in res['pv'].split()]
-    #print infoline
     return res
+
+
 
 def calculate_blunders(pgnpath):
     global engine
@@ -77,44 +79,6 @@ def calculate_blunders(pgnpath):
     blunder_result = {'result': gamepgn.result,'states': states, 'version': '1.0', 'pgnpath': pgnpath, 'startfen': gamepgn.fen, 'pgn': pgntext, 'moves': gamepgn.moves,}
     return blunder_result
 
-def add_missing_played_moves(states, gamepgn):
-    for movenum, state in states.items():
-        found = False
-        for move in state['moves']:
-            if move['playedmove']:
-                found = True
-                break
-        if found:
-            continue
-        if movenum + 1 in states:
-            nextstate = states[movenum+1]
-            nextstate_bestmove = None
-            if 'moves' in nextstate:
-                for s in nextstate['moves']:
-                    if 'bestmove' in s and s['bestmove']:
-                        nextstate_bestmove = s
-                        break
-            if not nextstate_bestmove:
-                continue
-            if nextstate_bestmove['value'] is not None:
-                nextstate_val = nextstate_bestmove['value']
-            else:
-                nextstate_val = ''  #this is a failure.
-                import ipdb;ipdb.set_trace()
-            #we should
-            nextpv = nextstate_bestmove['pv']
-            nextpv.insert(0, state['thismove'])
-            playedmove = {'bestmove': False,
-                'mate': nextstate_bestmove['mate'] and str(-1*int(nextstate_bestmove['mate'])) or '',
-                'move': state['thismove'],
-                'playedmove': True,
-                'pv': nextpv,  #we fake up the pv of the actually played move by looking ahead in the tree.
-                'nodes': 0,
-                'value': nextstate_val,
-                }
-            state['moves'].append(playedmove)
-    return states
-
 def do_game(pgnpath):
     assert os.path.isdir("js/pregen")
     assert os.path.exists(pgnpath)
@@ -125,7 +89,8 @@ def do_game(pgnpath):
     else:
         print 'will create %s' % jsfp
     blunder_result = calculate_blunders(pgnpath)
-    open(jsfp, 'w').write('testjson='+json.dumps(blunder_result))
+    formatted_json = json.dumps(blunder_result, sort_keys=True, indent=4)
+    open(jsfp, 'w').write('testjson='+formatted_json)
     htmlfp = jsfn.replace('.js', '.html')
     if os.path.exists(htmlfp):
         print 'overwriting %s' % htmlfp

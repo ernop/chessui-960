@@ -1,12 +1,15 @@
 function onDragStart(source, piece, position, orientation) {
     codeEl.html('drag start');
+    //debugger;
     clear_static_hovers();
-    highlight_moves_on_drag(source, piece, position, orientation, game.fen)
+    if (!mainline_disabled){
+        highlight_moves_on_drag(source, piece, position, orientation, game.fen)
+    }
     if (game.game_over() === true ||
         (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
         clear_board_highlights();
-        highlight_static_squares();
+        //highlight_static_squares();
         return false;
     }
 };
@@ -20,7 +23,9 @@ var onDrop = function(source, target) {
       if (move === null){
           codeEl.html('illegal move.')
           clear_board_highlights();
-          highlight_static_squares()
+          if (!mainline_disabled){
+              highlight_static_squares()
+          }
           return 'snapback';
       }
       updateStatus();
@@ -31,7 +36,7 @@ var onDrop = function(source, target) {
           var state=gamedata['states'][movenumber];
           actualmove=source+'-'+target;
           //maybe have an x in here?
-          if (actualmove==state['thismove']  && !mainline_disabled ){
+          if (actualmove==state['thislanmove']  && !mainline_disabled ){
               //advance
               load_movenum(movenumber+1,true)
           }else{
@@ -55,17 +60,15 @@ function load_variations(state, actualmove, in_mainline){
             thisguy=guy;
             //when not given the move, just show the best var
         }
-        else if (guy['move']==actualmove){
+        else if (guy['lanmove']==actualmove){
             thisguy=guy;
         }
     })
     if (thisguy){
         load_pv(thisguy['pv'], in_mainline);
     }
-
     clear_static_hovers()
     if (in_mainline){}else{mainline_disabled=true;}
-
     //it'll be unset if this was called from load_movenum.
 }
 

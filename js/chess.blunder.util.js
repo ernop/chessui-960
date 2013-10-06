@@ -48,7 +48,8 @@ function sort_by_strength(moves){
     var sortable = [];
     $.each(moves,function(index,guy){
         if (guy['mate']){
-            mateval=Math.abs(guy['mate'])
+            //mateval=Math.abs(guy['mate'])
+            mateval=guy['mate']*(Math.pow(-1,movenumber))
         }else{
             mateval=0;
         }

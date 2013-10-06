@@ -1,5 +1,7 @@
 import atexit, subprocess, logging, pprint
 
+from pychess.Utils.lutils import LBoard, lmove
+
 def setup_killer(engine):
     killer = Killer(engine)
     atexit.register(killer.dell)
@@ -49,6 +51,22 @@ def start_houdini():
 def setup_logging():
     FORMAT = '%(asctime)s %(levelname)s %(message)s'
     logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+
+def movelist2san(board, pv):
+    #import ipdb;ipdb.set_trace()
+    res = []
+    moved = 0
+    stfen = board.asFen()
+    for mv in pv:
+        nummove = lmove.parseAN(board, mv)
+        san = lmove.toSAN(board, nummove)
+        res.append(san)
+        board.applyMove(nummove)
+        moved += 1
+    for n in range(moved):
+        board.popMove()
+    assert board.asFen() == stfen
+    return res
 
 def display_results(states, gamepgn, FIRST, LAST, current):
     from precalc import get_board

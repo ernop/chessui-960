@@ -3,12 +3,31 @@ import pgn
 from pychess.Utils.lutils import LBoard, lmove
 log = logging.getLogger(__name__)
 
+FIRSTMOVE_THINK_TIME = 15
+#for every firstmove think this long.
 THINK_TIME = 5
 #per move from multipv
 FOR_BEST_TIME = 10
 #for the single best search on the raw board, to make sure we find it at least!
 OVERRIDE_TIME = 5
 #the first (bad) possible move will be searched to this depth.
+MOVE_GENERATION_MULTIPV = 50
+
+FAST = False
+FAST = True
+
+if FAST:
+    FIRSTMOVE_THINK_TIME = 1
+    #for every firstmove think this long.
+    THINK_TIME = 1
+    #per move from multipv
+    FOR_BEST_TIME = 1
+    #for the single best search on the raw board, to make sure we find it at least!
+    OVERRIDE_TIME = 1
+    #the first (bad) possible move will be searched to this depth.
+    MOVE_GENERATION_MULTIPV = 4
+
+
 
 setup_cmds = ['xboard',
               'uci',
@@ -112,7 +131,7 @@ class Engine(object):
         board = get_board(gamepgn, movenum)
         #the move he's going to play in this position.
         nowfen = board.asFen()
-        use_multipv = max(40-movenum/2, 4)
+        use_multipv = max(MOVE_GENERATION_MULTIPV-movenum/2, 4)
         print 'using multipv %d' % use_multipv
         self.set_multipv(use_multipv)
         self.put('position fen %s' % (nowfen))
@@ -136,7 +155,7 @@ class Engine(object):
         best = self.eval_for_best(board, gamepgn, movenum)
         possibles.append(best)
         possibles.sort(key=lambda x:x['value']*((-1)**movenum))
-        possibles = list(set([pos['move'] for pos in possibles]))
+        possibles = list(set([pos['lanmove'] for pos in possibles]))
         if including in possibles:  #stick the force move on the end for final evaluation.
             possibles.remove(including)
         possibles.append(including)
@@ -164,9 +183,14 @@ class Engine(object):
             move = read_move(line, board, gamepgn, movenum)
             if not move:
                 continue
-            if int(move['nodes']) < 10000 and not move['mate']:
-                import ipdb;ipdb.set_trace()
-            print 'evalled move %s %s %s' % (move['move'], move['nodes'], move['value'])
+            #if int(move['nodes']) < 10000 and not move['mate']:
+                #import ipdb;ipdb.set_trace()
+            #import ipdb;ipdb.set_trace()
+            if move['value'] != '':
+                val = '%04d' % int(move['value'])
+            else:
+                val = 'mate in %s' % move['mate']
+            print 'evalled move in time %s.     %s nodes = %09d %s' % (use_think_time, move['move'], int(move['nodes']), val)
 
             return move
 
@@ -175,6 +199,7 @@ class Engine(object):
         self.get()
         board = get_board(gamepgn, movenum)
         LANmove = lmove.toLAN (board, lmove.parseSAN(board, gamepgn.moves[movenum]))
+        SANmove = lmove.toSAN (board, lmove.parseSAN(board, gamepgn.moves[movenum]))
         LANmove = ''.join([c for c in LANmove.replace('x', '-') if c.lower()==c])
 
         possibles = self.get_possible_moves(movenum, gamepgn, board, including=LANmove)
@@ -185,11 +210,13 @@ class Engine(object):
             override_time = None  #first possible you consider, think longer.
             if ii == 0:
                 override_time = OVERRIDE_TIME
+            if movenum == 0:
+                override_time = FIRSTMOVE_THINK_TIME
             move = self.eval_one_move(board, gamepgn, movenum, override_time=override_time, possible=possible)
             if not move:
                 continue
             #need to decide which is the best now.
-            if move['move'] == LANmove:
+            if move['lanmove'] == LANmove:
                 move['playedmove'] = True
                 foundmove = True
             else:
@@ -206,7 +233,8 @@ class Engine(object):
         res = {
                'fen': nowfen,
                'moves': moves,
-               'thismove': LANmove,
+               'thislanmove': LANmove,
+               'thismove': SANmove,
                'nowfen': nowfen,
                }
         return res

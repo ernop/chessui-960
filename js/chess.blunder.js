@@ -35,8 +35,8 @@ function setup_current_move_info(num){
     clear_current_move_info()
     $.each(state['moves'],function(index,guy){
         //how to check if its the realmove?
-        var move={'move':guy['move'],'value':guy['value'],'bestmove':guy['bestmove'],'mate':guy['mate'],'nodes':guy['nodes']}
-        current_move_information[move['move']]=move;
+        var move={'lanmove':guy['lanmove'],'move':guy['move'],'value':guy['value'],'bestmove':guy['bestmove'],'mate':guy['mate'],'nodes':guy['nodes']}
+        current_move_information[move['lanmove']]=move;
     })
     eval_current_move_info()
 }
@@ -120,10 +120,10 @@ function eval_current_move_info(){
 
 function highlight_static_squares(){
     startsquares={}
-    played_coord=gamedata['states'][movenumber]['thismove'].split("-");
+    played_coord=gamedata['states'][movenumber]['thislanmove'].split("-");
     $.each(current_move_information, function(index,guy){
-        startsquare=guy['move'].split('-')[0]
-        endsquare=guy['move'].split('-')[1]
+        startsquare=guy['lanmove'].split('-')[0]
+        endsquare=guy['lanmove'].split('-')[1]
         var loss;
         if (guy['bestmove']==true){
             if (guy['mate']){
@@ -202,7 +202,7 @@ function highlight_moves_on_drag(source, piece, position, orientation, fen){
         var destsquare = $('div[data-square='+destcoord+']');
         destsquare.addClass('drag-value-highlighted');
         destsquare.addClass(guy['klass']);
-        played_coord=gamedata['states'][movenumber]['thismove'].split("-");
+        played_coord=gamedata['states'][movenumber]['thislanmove'].split("-");
         if (played_coord.indexOf(index.split('-')[0])!=-1){
             //hightlight the played dest square.
             $('div[data-square='+played_coord[1]+']').addClass('played')
@@ -213,7 +213,7 @@ function highlight_moves_on_drag(source, piece, position, orientation, fen){
 
 function draw_move_value(guy, target){
     var played;
-    if (gamedata['states'][movenumber]['thismove']==guy['move']){
+    if (gamedata['states'][movenumber]['thislanmove']==guy['lanmove']){
         played='played';
     }else{
         played='';
@@ -230,11 +230,10 @@ function draw_move_value(guy, target){
         calcval=guy['value'];
     }
     //should set up start / end square descriptors here for ease.
-    var start=guy['move'].split("-")[0]
-    var end=guy['move'].split("-")[1]
+    var start=guy['lanmove'].split("-")[0]
+    var end=guy['lanmove'].split("-")[1]
     //debugger;
-    var san = lookup_san(guy['move'])
-  var res='<tr class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['move']+'>'+san+'<td class="movevalue">'+calcval;
+    var res='<tr class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['lanmove']+'>'+guy['move']+'<td class="movevalue">'+calcval;
   target.append(res);
 }
 
@@ -270,28 +269,15 @@ function load_pv(pv, in_mainline){
     hovering=false;
     var_start_fen=game.fen();
     nowindex=0;
-    //debugger;
 
     var pv_start_square=pv[0].split('-')[0];
     var pv_end_square=pv[0].split('-')[1];
-    //debugger;
-    //$('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']')
     if (!in_mainline){
         $('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']').find('.movedesc').addClass('examining-var').html("variation");
     }
     pvEl.append($('<div class="medium">Variation:</div>'))
-    fakegame=new Chess;
-    fakegame.load(var_start_fen)
     $.each(pv, function(index,guy){
-        //debugger;
-        var san=lookup_san(guy, fakegame)
-        var movefrom=guy.split('-')[0]
-        var moveto=guy.split('-')[1]
-        var move=fakegame.move({from:movefrom,to:moveto});
-        if (move==null){san=guy;
-            //revert to using the algebraic.
-            }
-        var pvblock=$('<div pv-index='+index+' class="pvmove">'+san+'</div>');
+        var pvblock=$('<div pv-index='+index+' class="pvmove">'+guy+'</div>');
         pvEl.append(pvblock);
         pvblock.hover(function(thing){
                 if (hovering){return}
@@ -304,14 +290,7 @@ function load_pv(pv, in_mainline){
                 if (nowindex<=pvindex){
                     for (ii=nowindex;ii<=pvindex;ii++){
                         var thismove=pv[ii];
-                        var source=thismove.split('-')[0];
-                        var target=thismove.split('-')[1];
-                        var move = game.move({
-                            from: source,
-                            to: target
-                            //promotion: 'q'
-                            //todo fix this
-                        });
+                        var move = game.move(thismove)
                         //board.position(game.fen(),0)
                         //console.log("going forward: "+source+'-'+target);
                         if (move == null){statusEl.html('960 castling doesnt work in variations yet, sorry.')}
@@ -348,13 +327,15 @@ function setup_base_board(){
         onDragStart: onDragStart,
         onDrop: onDrop,
         onSnapEnd: onSnapEnd,
-        onMoveEnd: onMoveEnd
+        onMoveEnd: onMoveEnd,
+        showNotation:false
     };
     board = new ChessBoard('board', cfg);
     updateStatus();
 }
 
 function start_blunder(){
+    $(document).ready(function(){$("#flipper").click(function(){board.flip()})})
     codeEl=$('#code')
     setup_base_board();
     gamedata=get_json()
