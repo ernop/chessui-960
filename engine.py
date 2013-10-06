@@ -14,7 +14,7 @@ OVERRIDE_TIME = 5
 MOVE_GENERATION_MULTIPV = 50
 
 FAST = False
-FAST = True
+#FAST = True
 
 if FAST:
     FIRSTMOVE_THINK_TIME = 1
@@ -26,8 +26,6 @@ if FAST:
     OVERRIDE_TIME = 1
     #the first (bad) possible move will be searched to this depth.
     MOVE_GENERATION_MULTIPV = 4
-
-
 
 setup_cmds = ['xboard',
               'uci',
@@ -190,8 +188,7 @@ class Engine(object):
                 val = '%04d' % int(move['value'])
             else:
                 val = 'mate in %s' % move['mate']
-            print 'evalled move in time %s.     %s nodes = %09d %s' % (use_think_time, move['move'], int(move['nodes']), val)
-
+            print 'evalled move in time %s   %s nodes = %09d %s' % (use_think_time, int(move['nodes']), val, move['move'])
             return move
 
     def evalposition(self, gamepgn, movenum):

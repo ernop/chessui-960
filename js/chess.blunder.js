@@ -18,11 +18,12 @@ function load_movenum(num,instant){
     game.load(remove_castling_from_fen(gamedata['states'][num].nowfen));
     movenumber=num;
     setup_current_move_info(num)
+    show_move_values();
     reset_pv();
     load_variations(state, null, 1) //don't send any actual move, and send "in_mainline" as true
     mainline_disabled=false;
     highlight_static_squares()
-    show_move_values()
+
 }
 
 function reset_pv(){
@@ -233,7 +234,7 @@ function draw_move_value(guy, target){
     var start=guy['lanmove'].split("-")[0]
     var end=guy['lanmove'].split("-")[1]
     //debugger;
-    var res='<tr class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['lanmove']+'>'+guy['move']+'<td class="movevalue">'+calcval;
+    var res='<tr move='+guy['move']+' lanmove="'+guy['lanmove']+'" class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['move']+' lanmove="'+guy['lanmove']+'">'+guy['move']+'<td class="movevalue">'+calcval;
   target.append(res);
 }
 
@@ -272,8 +273,11 @@ function load_pv(pv, in_mainline){
 
     var pv_start_square=pv[0].split('-')[0];
     var pv_end_square=pv[0].split('-')[1];
+    $('.movedesc').removeClass('examining-var');
     if (!in_mainline){
-        $('.blunder-row[start-square='+pv_start_square+'][end-square='+pv_end_square+']').find('.movedesc').addClass('examining-var').html("variation");
+        $('.blunder-row[move='+pv[0]+']').find('.movedesc').addClass('examining-var').html("variation");
+    }else{
+        $('.blunder-row[move='+pv[0]+']').find('.movedesc').addClass('examining-var');
     }
     pvEl.append($('<div class="medium">Variation:</div>'))
     $.each(pv, function(index,guy){

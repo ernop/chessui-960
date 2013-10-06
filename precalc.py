@@ -7,7 +7,7 @@ testpgn = 'pgn/umaaki_vs_snowroads_2013_09_03.pgn'
 DEBUG_ENGINE = False
 engine = None
 GLOBAL_LAST = 2
-#GLOBAL_LAST = None
+GLOBAL_LAST = None
 
 from util import *
 
