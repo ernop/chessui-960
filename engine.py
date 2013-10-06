@@ -5,13 +5,13 @@ log = logging.getLogger(__name__)
 
 FIRSTMOVE_THINK_TIME = 15
 #for every firstmove think this long.
-THINK_TIME = 5
+THINK_TIME = 2
 #per move from multipv
-FOR_BEST_TIME = 10
+FOR_BEST_TIME = 4
 #for the single best search on the raw board, to make sure we find it at least!
-OVERRIDE_TIME = 5
+OVERRIDE_TIME = 2
 #the first (bad) possible move will be searched to this depth.
-MOVE_GENERATION_MULTIPV = 50
+MOVE_GENERATION_MULTIPV = 30
 
 FAST = False
 #FAST = True
@@ -29,8 +29,8 @@ if FAST:
 
 setup_cmds = ['xboard',
               'uci',
-              'setoption name Hash value 256',
-              'setoption name Threads value 2',
+              'setoption name Hash value 512',
+              'setoption name Threads value 3',
               'setoption name UCI_Chess960 value true',
               'isready',
               ]  #'setoption name MultiPV value %d' % MULTIPV]
@@ -188,7 +188,7 @@ class Engine(object):
                 val = '%04d' % int(move['value'])
             else:
                 val = 'mate in %s' % move['mate']
-            print 'evalled move in time %s   %s nodes = %09d %s' % (use_think_time, int(move['nodes']), val, move['move'])
+            print 'evalled move in %ds  nodes: %08d   val: %s %s' % (use_think_time, int(move['nodes']), val, move['move'])
             return move
 
     def evalposition(self, gamepgn, movenum):

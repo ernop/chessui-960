@@ -19,7 +19,7 @@
 .button :hover{background:blue;font-family:calibri;}
 .littlebutton{background:darkgrey;font-weight:bold;border:4px solid grey;border-radius:4px; display:inline-block;cursor:pointer;user-select:none;-webkit-user-select:none;-moz-user-select:none;}
 #navigate-restore{background:darkgrey;border:4px solid grey;border-radius:4px;cursor:pointer;user-select:none;-webkit-user-select:none;-moz-user-select:none;width:160px;padding:3px;margin-left:4px;margin-right:4px;float:right;}
-.movechoice{width:55px;padding:5px;font-size:1.3em;}
+.movechoice{width:70px;padding:5px;font-size:1.3em;}
 .movedesc{white-space:nowrap;padding:4px;padding:5px;width:50px;font-size:1.3em;}
 .movevalue{ padding-left:10px;font-size:2em;white-space:nowrap;}
 .hovered-movedesc{background-color:orchid;}

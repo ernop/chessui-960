@@ -234,7 +234,7 @@ function draw_move_value(guy, target){
     var start=guy['lanmove'].split("-")[0]
     var end=guy['lanmove'].split("-")[1]
     //debugger;
-    var res='<tr move='+guy['move']+' lanmove="'+guy['lanmove']+'" class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move='+guy['move']+' lanmove="'+guy['lanmove']+'">'+guy['move']+'<td class="movevalue">'+calcval;
+    var res='<tr move='+guy['move']+' lanmove="'+guy['lanmove']+'" class="blunder-row" start-square='+start+' end-square='+end+'><td class="movedesc '+played+'">'+played+'<td class="movechoice '+guy['klass']+'" move="'+guy['move']+'" lanmove="'+guy['lanmove']+'">'+guy['move']+'<td class="movevalue">'+calcval;
   target.append(res);
 }
 
@@ -275,9 +275,9 @@ function load_pv(pv, in_mainline){
     var pv_end_square=pv[0].split('-')[1];
     $('.movedesc').removeClass('examining-var');
     if (!in_mainline){
-        $('.blunder-row[move='+pv[0]+']').find('.movedesc').addClass('examining-var').html("variation");
+        $('.blunder-row[move="'+pv[0]+'"]').find('.movedesc').addClass('examining-var').html("variation");
     }else{
-        $('.blunder-row[move='+pv[0]+']').find('.movedesc').addClass('examining-var');
+        $('.blunder-row[move="'+pv[0]+'"]').find('.movedesc').addClass('examining-var');
     }
     pvEl.append($('<div class="medium">Variation:</div>'))
     $.each(pv, function(index,guy){
