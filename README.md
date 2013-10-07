@@ -5,7 +5,7 @@ a javascript chess game replayer with integrated display of pregenerated engine 
 
 example at:
 
-http://ernop.github.io/chessui-960
+http://fuseki.net/home/chess960-941.html
 
 
 Howto
